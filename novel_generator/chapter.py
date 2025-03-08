@@ -168,6 +168,8 @@ def build_chapter_prompt(
         )
         if not relevant_context.strip():
             relevant_context = "（无检索到的上下文）"
+        plot_arcs_file = os.path.join(filepath, "plot_arcs.txt")
+        plot_arcs_text = read_file(plot_arcs_file).strip() if os.path.exists(plot_arcs_file) else ""
         prompt_text = next_chapter_draft_prompt.format(
             novel_number=novel_number,
             word_number=word_number,
@@ -187,7 +189,9 @@ def build_chapter_prompt(
             global_summary=global_summary_text,
             character_state=character_state_text,
             context_excerpt=relevant_context,
-            previous_chapter_excerpt=previous_chapter_excerpt
+            previous_chapter_excerpt=previous_chapter_excerpt,
+            plot_arcs=plot_arcs_text,
+            report=""
         )
     return prompt_text
 

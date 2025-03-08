@@ -350,7 +350,8 @@ def do_consistency_check(self):
                 max_tokens=max_tokens,
                 timeout=timeout,
                 plot_arcs=plot_arcs_content,
-                filepath=filepath
+                filepath=filepath,
+                current_chap_num=chap_num
             )
             self.safe_log("审校结果：")
             self.safe_log(result)
