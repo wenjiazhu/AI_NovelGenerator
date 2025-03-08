@@ -233,13 +233,42 @@ def generate_chapter_draft(
     interface_format: str = "openai",
     max_tokens: int = 2048,
     timeout: int = 600,
-    custom_prompt_text: str = None
+    custom_prompt_text: str = None,
+    new_plot_arcs: list = None  # 新增参数用于接收新增的剧情要点或未解决冲突
 ) -> str:
     """
     生成章节草稿，支持自定义提示词
     """
-    if custom_prompt_text is None:
-        prompt_text = build_chapter_prompt(
+    if new_plot_arcs:
+        plot_arcs_text = '\n'.join(new_plot_arcs)  # 将新增的剧情要点合并为文本
+        if custom_prompt_text is None:
+            prompt_text = build_chapter_prompt(
+                api_key=api_key,
+                base_url=base_url,
+                model_name=model_name,
+                filepath=filepath,
+                novel_number=novel_number,
+                word_number=word_number,
+                temperature=temperature,
+                user_guidance=user_guidance,
+                characters_involved=characters_involved,
+                key_items=key_items,
+                scene_location=scene_location,
+                time_constraint=time_constraint,
+                embedding_api_key=embedding_api_key,
+                embedding_url=embedding_url,
+                embedding_interface_format=embedding_interface_format,
+                embedding_model_name=embedding_model_name,
+                embedding_retrieval_k=embedding_retrieval_k,
+                interface_format=interface_format,
+                max_tokens=max_tokens,
+                timeout=timeout
+            )
+            prompt_text += f'\n\n新增的剧情要点或未解决冲突:\n{plot_arcs_text}'  # 将新增的剧情要点添加到提示词中
+        else:
+            prompt_text = custom_prompt_text + f'\n\n新增的剧情要点或未解决冲突:\n{plot_arcs_text}'  # 将新增的剧情要点添加到自定义提示词中
+    else:
+        prompt_text = custom_prompt_text if custom_prompt_text else build_chapter_prompt(
             api_key=api_key,
             base_url=base_url,
             model_name=model_name,
@@ -261,8 +290,6 @@ def generate_chapter_draft(
             max_tokens=max_tokens,
             timeout=timeout
         )
-    else:
-        prompt_text = custom_prompt_text
 
     chapters_dir = os.path.join(filepath, "chapters")
     os.makedirs(chapters_dir, exist_ok=True)
