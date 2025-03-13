@@ -25,12 +25,10 @@ def generate_novel_architecture_ui(self):
         return
 
     def task():
-
         confirm = messagebox.askyesno("确认", "确定要生成小说架构吗？")
         if not confirm:
             self.enable_button_safe(self.btn_generate_architecture)
             return
-
 
         self.disable_button_safe(self.btn_generate_architecture)
         try:
@@ -46,6 +44,8 @@ def generate_novel_architecture_ui(self):
             genre = self.genre_var.get().strip()
             num_chapters = self.safe_get_int(self.num_chapters_var, 10)
             word_number = self.safe_get_int(self.word_number_var, 3000)
+            # 获取内容指导
+            user_guidance = self.user_guide_text.get("0.0", "end").strip()
 
             self.safe_log("开始生成小说架构...")
             Novel_architecture_generate(
@@ -60,7 +60,8 @@ def generate_novel_architecture_ui(self):
                 filepath=filepath,
                 temperature=temperature,
                 max_tokens=max_tokens,
-                timeout=timeout_val
+                timeout=timeout_val,
+                user_guidance=user_guidance  # 添加内容指导参数
             )
             self.safe_log("✅ 小说架构生成完成。请在 'Novel Architecture' 标签页查看或编辑。")
         except Exception:
@@ -178,6 +179,10 @@ def generate_chapter_draft_ui(self):
                 dialog.geometry("600x400")
                 text_box = ctk.CTkTextbox(dialog, wrap="word", font=("Microsoft YaHei", 12))
                 text_box.pack(fill="both", expand=True, padx=10, pady=10)
+
+                # 字数统计标签
+                wordcount_label = ctk.CTkLabel(dialog, text="字数：0", font=("Microsoft YaHei", 12))
+                wordcount_label.pack(side="left", padx=(10,0), pady=5)
                 
                 # 插入角色内容
                 final_prompt = prompt_text
@@ -222,6 +227,16 @@ def generate_chapter_draft_ui(self):
                         final_prompt = '\n'.join(lines)
 
                 text_box.insert("0.0", final_prompt)
+                # 更新字数函数
+                def update_word_count(event=None):
+                    text = text_box.get("0.0", "end-1c")
+                    text_length = len(text)
+                    wordcount_label.configure(text=f"字数：{text_length}")
+
+                text_box.bind("<KeyRelease>", update_word_count)
+                text_box.bind("<ButtonRelease>", update_word_count)
+                update_word_count()  # 初始化统计
+
                 button_frame = ctk.CTkFrame(dialog)
                 button_frame.pack(pady=10)
                 def on_confirm():
@@ -442,7 +457,12 @@ def import_knowledge_handler(self):
                 self.handle_exception("导入知识库时出错")
             finally:
                 self.enable_button_safe(self.btn_import_knowledge)
-        threading.Thread(target=task, daemon=True).start()
+        try:
+            thread = threading.Thread(target=task, daemon=True)
+            thread.start()
+        except Exception as e:
+            self.enable_button_safe(self.btn_import_knowledge)
+            messagebox.showerror("错误", f"线程启动失败: {str(e)}")
 
 def clear_vectorstore_handler(self):
     filepath = self.filepath_var.get().strip()
