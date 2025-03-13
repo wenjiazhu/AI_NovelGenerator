@@ -193,9 +193,9 @@ def check_consistency(
         if filepath:
             plot_arcs_file = os.path.join(filepath, "plot_arcs.txt")
             original_plot_arcs_content = read_file(plot_arcs_file) # 读取 plot_arcs 文件原始内容
-            with open(plot_arcs_file, 'w', encoding='utf-8') as f: #  'w' 模式改为 'a' 模式，追加写入
+            with open(plot_arcs_file, 'w', encoding='utf-8') as f:
                 updated_plot_arcs_content = original_plot_arcs_content + "\n\n" + "\n".join(new_plot_arcs_extracted) if new_plot_arcs_extracted else original_plot_arcs_content
-                f.write(updated_plot_arcs_content) # 写入更新后的 plot_arcs 内容
+                f.write(updated_plot_arcs_content)
             print(f"[ConsistencyChecker] Plot arcs have been updated and written to {plot_arcs_file}")
 
             # 将一致性审校报告写入文件
