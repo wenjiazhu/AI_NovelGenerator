@@ -13,7 +13,7 @@ CONSISTENCY_PROMPT = """\
 - 角色状态（可能包含重要信息）：
 {character_state}
 
-- 全局摘要：
+- 前文摘要：
 {global_summary}
 
 - 已记录的未解决冲突或剧情要点：
