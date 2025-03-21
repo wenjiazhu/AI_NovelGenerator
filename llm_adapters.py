@@ -104,14 +104,14 @@ class GeminiAdapter(BaseLLMAdapter):
         self.temperature = temperature
         self.timeout = timeout
 
-        self._client = genai.Client(api_key=self.api_key)
+        genai.configure(api_key=self.api_key)
+        self._model = genai.GenerativeModel(self.model_name)
 
     def invoke(self, prompt: str) -> str:
         try:
-            response = self._client.models.generate_content(
-                model = self.model_name,
-                contents = prompt,
-                config = genai.types.GenerateContentConfig(
+            response = self._model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
                     max_output_tokens=self.max_tokens,
                     temperature=self.temperature,
                 )
